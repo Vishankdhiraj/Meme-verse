@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MemeVerse - Home</title>
+  <link rel="stylesheet" href="./index.css">
+  
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MemeVerse</h1>
+    <button class="toggle-mode" id="themeToggle">Dark Mode</button>
+  </header>
+
+  <main>
+    <div class="meme-container" id="memeContainer">
+      </div>
+  </main>
+
+    <div class="container">
+      <div class="filters">
+        <button data-category="trending">Trending</button>
+        <button data-category="new">New</button>
+        <button data-category="classic">Classic</button>
+        <button data-category="random">Random</button>
+      </div>
+  
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search memes...">
+      </div>
+  
+      <div class="sort-options">
+        <select id="sortSelect">
+          <option value="likes">Likes</option>
+          <option value="date">Date</option>
+          <option value="comments">Comments</option>
+        </select>
+      </div>
+  
+      <div class="meme-grid" id="memeGrid">
+          <div class="loading" id="loading">Loading...</div>
+      </div>
+    </div>
+  
+
+  <script>
+    const memeContainer = document.getElementById('memeContainer');
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+
+    const fetchTrendingMemes = async () => {
+      try {al
+        const response = await fetch('https://api.imgflip.com/get_memes');
+        const data = await response.json();
+        const memes = data.data.memes.slice(0, 10); // Get top 10
+
+        memes.forEach(meme => {
+          const memeItem = document.createElement('div');
+          memeItem.classList.add('meme-item');
+          memeItem.innerHTML = `
+            <img src="${meme.url}" alt="${meme.name}">
+            <div class="meme-details">
+              <h3>${meme.name}</h3>
+            </div>
+          `;
+          memeContainer.appendChild(memeItem);
+        });
+      } catch (error) {
+        console.error('Error fetching memes:', error);
+        memeContainer.innerHTML = '<p>Failed to load memes.</p>';
+      }
+    };
+
+    fetchTrendingMemes();
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      if (body.classList.contains('dark-mode')) {
+        themeToggle.textContent = 'Light Mode';
+      } else {
+        themeToggle.textContent = 'Dark Mode';
+      }
+    });
+    const memeGrid = document.getElementById('memeGrid');
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const filters = document.querySelector('.filters');
+    const loading = document.getElementById('loading');
+    let memes = [];
+    let currentCategory = 'trending';
+    let searchQuery = '';
+    let sortOption = 'likes';
+    let page = 1; // For pagination, if needed
+
+    const fetchMemes = async () => {
+        
+        if (currentCategory === 'random') {
+            apiUrl = 'https://api.imgflip.com/get_memes'; // Imgflip does not have a real random category
+        }
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            memes = data.data.memes;
+            filterAndSortMemes();
+        } catch (error) {
+            console.error('Error fetching memes:', error);
+            memeGrid.innerHTML = '<p>Failed to load memes.</p>';
+        } finally {
+            loading.style.display = 'none';
+        }
+    };
+
+    const filterAndSortMemes = () => {
+      let filteredMemes = memes.filter(meme => meme.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      // Placeholder for sort logic (replace with actual sorting)
+      if (sortOption === 'likes') {
+        // Implement sort by likes logic (requires API data)
+      } else if (sortOption === 'date') {
+        // Implement sort by date logic (requires API data)
+      } else if (sortOption === 'comments') {
+        // Implement sort by comments logic (requires API d
+      }
+      displayMemes(filteredMemes);
+    };
+
+    const displayMemes = (memesToDisplay) => {
+      memeGrid.innerHTML = '';
+      memesToDisplay.forEach(meme => {
+        const memeItem = document.createElement('div');
+        memeItem.classList.add('meme-item');
+        memeItem.innerHTML = `
+          <img src="${meme.url}" alt="${meme.name}">
+          <div class="meme-details">
+            <h3>${meme.name}</h3>
+          </div>
+        `;
+        memeGrid.appendChild(memeItem);
+      });
+    };
+
+    filters.addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON') {
+        currentCategory = e.target.dataset.category;
+        page = 1;
+        fetchMemes();
+      }
+    });
+
+    searchInput.addEventListener('input', () => {
+      // Debouncing logic (replace with actual debouncing)
+      searchQuery = searchInput.value;
+      filterAndSortMemes();
+    });
+
+    sortSelect.addEventListener('change', () => {
+      sortOption = sortSelect.value;
+      filterAndSortMemes();
+    });
+
+    fetchMemes(); // Initial f
+
+  </script>
+</body>
+</html>
